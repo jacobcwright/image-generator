@@ -4,7 +4,7 @@ import path from 'path'
 
 const DATA_FILE = path.join(process.cwd(), 'data.json')
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
     return res.status(405).end()
   }
@@ -17,3 +17,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(500).json({ error: 'Error reading data' })
   }
 }
+
+export default handler
