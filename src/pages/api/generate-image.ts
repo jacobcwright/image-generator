@@ -7,7 +7,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 const DATA_FILE = path.join(process.cwd(), 'data.json')
 const fileMutex = new Mutex()
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const API_KEY = process.env.API_KEY || ''
   if (!API_KEY) {
     return res.status(500).send('API_KEY not set')
@@ -76,3 +76,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(500).send('Error generating image')
   }
 }
+
+export default handler
