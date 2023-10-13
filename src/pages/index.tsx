@@ -36,7 +36,7 @@ const Home: React.FC = () => {
       },
       body: JSON.stringify({ prompt: promptData }),
     })
-    const data = await response.json()
+    await response.json()
     setLoading((prevLoading) => prevLoading - 1)
     await fetchImages()
   }
