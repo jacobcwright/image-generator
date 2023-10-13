@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 type Image = {
   name: string
@@ -38,25 +40,33 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className='w-full flex-col items-center justify-center h-full p-8'>
+      <h1 className='text-3xl text-center'>Unstable Compressor</h1>
       <form onSubmit={handleSubmit}>
-        <input
+        <Input
           value={prompt}
           onChange={handlePromptChange}
-          placeholder='Enter a prompt'
+          placeholder='Describe your image...'
         />
-        <button type='submit'>Generate Image</button>
+        <Button type='submit'>Generate Image</Button>
       </form>
-      <div>
-        {images?.map((img) => (
+      <div className='mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8'>
+        {images.map((img) => (
           <div key={img.name}>
-            <Image
-              src={`/images/${img.name}`}
-              alt={img.prompt}
-              height={256}
-              width={256}
-            />
-            <p>{img.prompt}</p>
+            <div className='relative'>
+              <div className='relative h-72 w-full overflow-hidden rounded-lg'>
+                <img
+                  src={`/images/${img.name}`}
+                  alt={img.prompt}
+                  className='h-full w-full object-cover object-center'
+                />
+              </div>
+              <div className='relative mt-4'>
+                <h3 className='text-sm font-medium text-gray-900'>
+                  {img.prompt}
+                </h3>
+              </div>
+            </div>
           </div>
         ))}
       </div>
