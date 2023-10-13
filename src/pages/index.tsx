@@ -9,6 +9,7 @@ type Image = {
 }
 
 const Home: React.FC = () => {
+  const [loading, setLoading] = useState<boolean>(false)
   const [prompt, setPrompt] = useState<string>('')
   const [images, setImages] = useState<Image[]>([])
 
@@ -33,6 +34,7 @@ const Home: React.FC = () => {
       const data = await res.json()
       setImages((prevImages) => [...prevImages, data])
     })
+    setPrompt('')
   }
 
   const handlePromptChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -41,12 +43,18 @@ const Home: React.FC = () => {
 
   return (
     <div className='w-full flex-col items-center justify-center h-full p-8'>
-      <h1 className='text-3xl text-center'>Unstable Compressor</h1>
-      <form onSubmit={handleSubmit}>
+      <h1 className='text-6xl text-center mb-4 font-mono'>
+        Unstable Compressor
+      </h1>
+      <form
+        onSubmit={handleSubmit}
+        className='w-full flex flex-col gap-4 justify-center items-center'
+      >
         <Input
           value={prompt}
           onChange={handlePromptChange}
           placeholder='Describe your image...'
+          className='w-1/2 '
         />
         <Button type='submit'>Generate Image</Button>
       </form>
