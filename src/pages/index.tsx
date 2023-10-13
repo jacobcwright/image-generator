@@ -2,6 +2,7 @@ import Image from 'next/image'
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type Image = {
   name: string
@@ -9,32 +10,35 @@ type Image = {
 }
 
 const Home: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<number>(0)
   const [prompt, setPrompt] = useState<string>('')
   const [images, setImages] = useState<Image[]>([])
 
+  async function fetchImages() {
+    const response = await fetch('/api/get-images')
+    const data = await response.json()
+    setImages(data.images)
+  }
+
   useEffect(() => {
-    async function fetchImages() {
-      const response = await fetch('/api/get-images')
-      const data = await response.json()
-      setImages(data.images)
-    }
     fetchImages()
   }, [])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    fetch('/api/generate-image', {
+    setLoading((prevLoading) => prevLoading + 1)
+    const promptData = prompt
+    setPrompt('')
+    const response = await fetch('/api/generate-image', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ prompt }),
-    }).then(async (res) => {
-      const data = await res.json()
-      setImages((prevImages) => [...prevImages, data])
+      body: JSON.stringify({ prompt: promptData }),
     })
-    setPrompt('')
+    const data = await response.json()
+    setLoading((prevLoading) => prevLoading - 1)
+    await fetchImages()
   }
 
   const handlePromptChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +63,14 @@ const Home: React.FC = () => {
         <Button type='submit'>Generate Image</Button>
       </form>
       <div className='mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8'>
-        {images.map((img) => (
+        {Array.from({ length: loading }).map((_, i) => (
+          <div className='relative' key={i}>
+            <div className='relative h-72 w-full overflow-hidden rounded-lg'>
+              <Skeleton className='h-full w-full object-cover object-center' />
+            </div>
+          </div>
+        ))}
+        {[...images].reverse().map((img) => (
           <div key={img.name}>
             <div className='relative'>
               <div className='relative h-72 w-full overflow-hidden rounded-lg'>
@@ -69,10 +80,12 @@ const Home: React.FC = () => {
                   className='h-full w-full object-cover object-center'
                 />
               </div>
-              <div className='relative mt-4'>
-                <h3 className='text-sm font-medium text-gray-900'>
-                  {img.prompt}
-                </h3>
+              <div className='absolute inset-x-0 top-0 flex h-72 items-end justify-end overflow-hidden rounded-lg p-4'>
+                <div
+                  aria-hidden='true'
+                  className='absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black opacity-50'
+                />
+                <p className='relative font-light text-white'>{img.prompt}</p>
               </div>
             </div>
           </div>
